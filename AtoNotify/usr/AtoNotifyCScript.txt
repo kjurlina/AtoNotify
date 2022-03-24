@@ -1,0 +1,113 @@
+BOOL GMsgFunction( char* pszMsgData)
+{
+  // Skripta za slanje poruka uslijed alarma
+  // Poruke se salju malom konzolaskom aplikacijom sa racunanotify@ato.hr
+  // Coding by kjurlina. Have a lot of fun
+
+  // Varijable vezane uz putanju projekta i programa za slanje mailova
+  // Zamijeniti sa pravom putanjom. Paziti na escape charactere
+  char AtoNotifyPath[_MAX_PATH] = "C:\\_Temp\\TEST\\TEST\\AtoNotify\\AtoNotify.exe";
+	
+  // Varijable vazane uz alarm i redundanciju
+  MSG_RTDATA_STRUCT mRT;
+  MSG_CSDATA_STRUCT sM; //Informacije o alarmu
+  MSG_TEXT_STRUCT tMeld; // Tu se nalazi tekst alarma
+  CMN_ERROR pError;   
+  char MsgTSYear[8] = '\0';
+  char MsgTSMonth[8] = '\0';
+  char MsgTSDay[8] = '\0';
+  char MsgTSHour[8] = '\0';
+  char MsgTSMinute[8] = '\0';
+  char MsgTSSecond[8] = '\0';
+  char MsgTSMillisecond[8] = '\0';
+  char MsgTSDate[16] = '\0';
+  char MsgTSTime[16] = '\0';
+  char MsgText[255] = '\0';
+  int RedStatus;
+  memset( &mRT, 0, sizeof( MSG_RTDATA_STRUCT ) );
+
+  // Procitaj status redundancije
+  RedStatus = GetTagBit("@RM_MASTER");
+
+
+  // Fetchanje podataka iz sirovog ulaznog materijala 
+  if( pszMsgData != NULL )
+  {
+     sscanf( pszMsgData,  "%ld,%ld,%04d.%02d.%02d,%02d:%02d:%02d:%03d,%ld, %ld, %ld, %d,%d",
+	&mRT.dwMsgNr, 			// Broj poruke
+	&mRT.dwMsgState,  		// Status alarma
+	&mRT.stMsgTime.wYear, 		// Godina
+	&mRT.stMsgTime.wMonth, 		// Mjesec
+	&mRT.stMsgTime.wDay,		// Dan
+	&mRT.stMsgTime.wHour, 		// Sat
+	&mRT.stMsgTime.wMinute,		// Minuta
+	&mRT.stMsgTime.wSecond, 	// Sekunda
+	&mRT.stMsgTime.wMilliseconds,	// Milisekunda
+	&mRT.dwTimeDiff,			
+	&mRT.dwCounter,			
+	&mRT.dwFlags,			
+	&mRT.wPValueUsed,
+	&mRT.wTextValueUsed );
+ 
+    } 
+
+ // Slanje alarma samo na rastuci brid dolaznih poruka
+  if(mRT.dwMsgState == MSG_STATE_COME && RedStatus == 1)
+  {
+    // Procitaj sve potrebne podatke o alarmu
+    MSRTGetMsgCSData(mRT.dwMsgNr, &sM, &pError);  
+
+    // Napravi stringove sa vremenskim zigovima (datum + vrijeme)
+    sprintf(MsgTSYear, "%d", mRT.stMsgTime.wYear);
+    sprintf(MsgTSMonth, "%d", mRT.stMsgTime.wMonth);
+    sprintf(MsgTSDay, "%d", mRT.stMsgTime.wDay);
+    sprintf(MsgTSHour, "%d", mRT.stMsgTime.wHour);
+    sprintf(MsgTSMinute, "%d", mRT.stMsgTime.wMinute);
+    sprintf(MsgTSSecond, "%d", mRT.stMsgTime.wSecond);
+    sprintf(MsgTSMillisecond, "%d", mRT.stMsgTime.wMilliseconds);
+
+    strcat(MsgTSDate, MsgTSDay);
+    strcat(MsgTSDate, ".");
+    strcat(MsgTSDate, MsgTSMonth);
+    strcat(MsgTSDate, ".");
+    strcat(MsgTSDate, MsgTSYear);
+    strcat(MsgTSDate, ".");
+
+    strcat(MsgTSTime, MsgTSHour);
+    strcat(MsgTSTime, ":");
+    strcat(MsgTSTime, MsgTSMinute);
+    strcat(MsgTSTime, ":");
+    strcat(MsgTSTime, MsgTSSecond);
+    strcat(MsgTSTime, ".");
+    strcat(MsgTSTime, MsgTSMillisecond);
+    
+    // Procitaj tekst alarma
+    MSRTGetMsgText( 0, sM.dwTextID[0], &tMeld, &pError);
+    strcat(MsgText, tMeld.szText);
+
+    // Spoji sve stringove u komandu (putanja + vremenski zigovi + tekst poruke)
+    strcat(AtoNotifyPath, " ");
+    strcat(AtoNotifyPath, MsgTSDate);
+    strcat(AtoNotifyPath, " ");
+    strcat(AtoNotifyPath, MsgTSTime);
+    strcat(AtoNotifyPath, " ");
+    strcat(AtoNotifyPath, MsgText);
+    // Posalji poruku
+    WinExec(AtoNotifyPath, SW_SHOWMINIMIZED);
+    // printf("Poruka poslana\r\n");
+  }
+  else if(mRT.dwMsgState == MSG_STATE_COME && RedStatus == 0)
+  {
+    // printf("Nisam redundantni master\r\n");
+  }
+  else
+  {
+  }
+// Ostavljam samo kao primjer kako izvjeda struktura dolaznih podataka. Iskomentirati po potrebi pa pratiti u debug prozoru
+// printf("Nr : %d, St: %x, %d-%d-%d %d:%d:%d.%d, Dur: %d, Cnt %d, Fl %d\r\n" , 
+// mRT.dwMsgNr, mRT.dwMsgState, mRT.stMsgTime.wDay, mRT.stMsgTime.wMonth, mRT.stMsgTime.wYear, 
+// mRT.stMsgTime.wHour, mRT.stMsgTime.wMinute, mRT.stMsgTime.wSecond, mRT.stMsgTime.wMilliseconds, mRT.dwTimeDiff,
+// mRT.dwCounter, mRT.dwFlags ) ;
+
+return( TRUE );
+}
