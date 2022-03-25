@@ -82,7 +82,7 @@ namespace AtoNotify
                 // Definiraj SMPT klijenta
                 SmtpClient AtoSMTP = new SmtpClient("smtp.office365.com");
 
-                // Definiraj kredencijali
+                // Definiraj kredencijale
                 AtoSMTP.UseDefaultCredentials = false;
                 NetworkCredential basicAuthenticationInfo = new NetworkCredential("notifier@ato.hr", "Password");
                 AtoSMTP.Credentials = basicAuthenticationInfo;
