@@ -90,7 +90,7 @@ namespace AtoNotify
 
                 // Kreiraj poruku
                 MailAddress from = new MailAddress("notifier@ato.hr", "ATO Notifikator");
-                MailAddress to = new MailAddress("email.adresaime@klijent.hr ", "Dežurna služba održavanja");
+                MailAddress to = new MailAddress("email.adresaime@klijent.com ", "Dežurna služba održavanja");
                 MailMessage msg = new MailMessage(from, to);
 
                 msg.Subject = "ATO Notifikator :: NUS šalje poruku :: " + message + " :: " + date + " " + time;
