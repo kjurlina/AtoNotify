@@ -84,16 +84,16 @@ namespace AtoNotify
 
                 // Definiraj kredencijali
                 AtoSMTP.UseDefaultCredentials = false;
-                NetworkCredential basicAuthenticationInfo = new NetworkCredential("notifier@ato.hr", "Xax75901");
+                NetworkCredential basicAuthenticationInfo = new NetworkCredential("notifier@ato.hr", "Password");
                 AtoSMTP.Credentials = basicAuthenticationInfo;
                 AtoSMTP.EnableSsl = true;
 
                 // Kreiraj poruku
                 MailAddress from = new MailAddress("notifier@ato.hr", "ATO Notifikator");
-                MailAddress to = new MailAddress("alarm.odvodnja@dj-vodovod.hr ", "Dežurna služba održavanja ADJ CNUS");
+                MailAddress to = new MailAddress("email.adresaime@klijent.hr ", "Dežurna služba održavanja");
                 MailMessage msg = new MailMessage(from, to);
 
-                msg.Subject = "ATO Notifikator :: CNUS šalje poruku :: " + message + " :: " + date + " " + time;
+                msg.Subject = "ATO Notifikator :: NUS šalje poruku :: " + message + " :: " + date + " " + time;
                 msg.SubjectEncoding = msg.BodyEncoding = Encoding.UTF8;
                 msg.IsBodyHtml = true;
                 msg.Body = "Tekst alarma :: " + message + " <br />" + "Vremenski žig alarma :: " + date + " " + time;
