@@ -7,8 +7,8 @@ namespace AtoNotify
 {
     internal class AtoNotify
     {
-        // Ovaj komad koda prima dva argumenta na ulaz: vremenski žig i tekst poruke
-        // Od te dvije informacije sastavlja se poruka koja se šalje klijentu preko notify@ato.hr računa
+        // Ovaj komad koda prima tri argumenta na ulaz: datum, vrijeme i tekst poruke. Dakle, minimalno tri ulazna stringa odvojena zarezom.
+        // Od te tri informacije sastavlja se poruka koja se šalje klijentu preko notify@ato.hr računa
         // Imati na umu da aplikacija nije definirana kao konzolaška - to jest nema niti jednog vidljivog prozora
         // To se može promijeniti u property sheetu aplikacije - odabrati "Console application"
         // Coding by kjurlina. Have a lot of fun.
